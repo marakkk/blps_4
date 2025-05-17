@@ -1,0 +1,13 @@
+spring.datasource.url: jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username: admin
+spring.datasource.password: admin
+spring.datasource.driver-class-name: org.postgresql.Driver
+camunda:
+  bpm:
+    generic-properties:
+      properties:
+        historyTimeToLive: 180
+
+camunda.bpm.admin-user:
+  id: admin
+  password: admin
