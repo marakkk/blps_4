@@ -165,10 +165,10 @@
       <bpmn:outgoing>Flow_1fathe1</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_0vzbp0m" name="Нет" sourceRef="Gateway_0witg8a" targetRef="Activity_10bpczs">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1fathe1" name="Да" sourceRef="Gateway_0witg8a" targetRef="Activity_08r0fcj">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_12t7sbx" sourceRef="Activity_0j8g6hn" targetRef="Event_1v0bj4w" />
     <bpmn:userTask id="Activity_0rvvzrl" name="Проверка модератора">
@@ -209,6 +209,7 @@
       <bpmn:outgoing>Flow_1wzup9u</bpmn:outgoing>
       <bpmn:outgoing>Flow_1ibst4y</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+
     <bpmn:sequenceFlow id="Flow_1wzup9u" name="Да" sourceRef="Gateway_1r8j49w" targetRef="Activity_17nktqr" >
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
