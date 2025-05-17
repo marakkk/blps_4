@@ -14,6 +14,7 @@ import com.blps.lab4.repo.googleplay.AppRepository;
 import com.blps.lab4.repo.googleplay.DeveloperRepository;
 import com.blps.lab4.repo.payments.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.RuntimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class DeveloperService {
     private final PaymentRepository paymentRepository;
     private final GooglePlayService googlePlayService;
     private final UserTransactionManager userTransaction;
+    private final RuntimeService runtimeService;
 
 
     private boolean isValidVersion(double version) {
@@ -117,6 +119,14 @@ public class DeveloperService {
 
             notifyDeveloperPaymentSuccess(developer, payment);
 
+            Map<String, Object> variables = Map.of(
+                    "developerId", developerId,
+                    "appId", appId,
+                    "monetizationType", monetizationType.name()
+            );
+            runtimeService.startProcessInstanceByKey("submitAppProcess", variables);
+
+
             userTransaction.commit();
             return app;
         } catch (Exception e) {
@@ -145,6 +155,15 @@ public class DeveloperService {
 
             if ("App approved automatically.".equals(reviewResult.get("message"))) {
                 googlePlayService.publishApp(app);
+
+                Map<String, Object> variables = Map.of(
+                        "developerId", developerId,
+                        "appId", appId,
+                        "approvedByModerator", true,
+                        "moderatorComment", "Auto-approved"
+                );
+                runtimeService.startProcessInstanceByKey("publishAppProcess", variables);
+
                 userTransaction.commit();
                 return Map.of("message", "Published automatically");
             }
@@ -157,6 +176,15 @@ public class DeveloperService {
                 }
 
                 googlePlayService.publishApp(app);
+
+                Map<String, Object> variables = Map.of(
+                        "developerId", developerId,
+                        "appId", appId,
+                        "approvedByModerator", approvedByModerator,
+                        "moderatorComment", moderatorComment
+                );
+                runtimeService.startProcessInstanceByKey("publishAppProcess", variables);
+
                 userTransaction.commit();
                 return Map.of("message", "Published after review");
             }
