@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("createJiraTaskDelegate")
 public class CreateJiraTaskDelegate implements JavaDelegate {
 
     private final ConnectionFactory jiraConnectionFactory;

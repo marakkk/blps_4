@@ -21,11 +21,6 @@ public class GooglePlayService {
     private final AppRepository appRepository;
     private final Random random = new Random();
 
-    @Autowired
-    private ConnectionFactory jiraConnectionFactory;
-
-    private final MailNotificationService mailNotificationService;
-
     public Map<String, String> autoReviewApp(App app) {
 
         if (app.getStatus() != AppStatus.PENDING) {
@@ -74,48 +69,17 @@ public class GooglePlayService {
             throw new IllegalStateException("App must be in UNDER_REVIEW status for manual review.");
         }
 
-        try (JiraConnection jiraConnection = (JiraConnection) jiraConnectionFactory.getConnection()) {
-
-            JiraInteraction interaction = (JiraInteraction) jiraConnection.createInteraction();
-            var response = (JiraResponseRecord) interaction.execute(new JiraRequestRecord(
-                            app.getName(),
-                            app.getId(),
-                            "createTask",
-                            "Create review task for app: " + app.getName()
-                    ));
-
-            interaction.execute(new JiraStatusUpdateRecord(
-                            response.getIssueId(),
-                            "In Progress",
-                            "updateStatus"
-                    ));
-
-            mailNotificationService.notifyModeratorOfNewTask(app.getName(), app.getId(), response.getIssueId());
-
-            Map<String, String> responses = new HashMap<>();
-            if (approved) {
-                app.setStatus(AppStatus.APPROVED);
-                interaction.execute(new JiraStatusUpdateRecord(
-                                response.getIssueId(),
-                                "Done",
-                                "updateStatus"
-                        ));
-                responses.put("message", "App approved by moderator.");
-            } else {
-                app.setStatus(AppStatus.REJECTED);
-                interaction.execute(new JiraStatusUpdateRecord(
-                                response.getIssueId(),
-                                "Rejected",
-                                "updateStatus"
-                        ));
-                responses.put("reason", moderatorComment);
-            }
-
-            appRepository.save(app);
-            return responses;
-        } catch (ResourceException e) {
-            throw new RuntimeException("Failed to connect to Jira via JCA", e);
+        Map<String, String> responses = new HashMap<>();
+        if (approved) {
+            app.setStatus(AppStatus.APPROVED);
+            responses.put("message", "App approved by moderator.");
+        } else {
+            app.setStatus(AppStatus.REJECTED);
+            responses.put("reason", moderatorComment);
         }
+
+        appRepository.save(app);
+        return responses;
     }
 
     public void publishApp(App app) {

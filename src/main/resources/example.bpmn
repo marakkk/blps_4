@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0lsr8tq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0lsr8tq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
   <bpmn:collaboration id="Collaboration_1vwk3m0">
     <bpmn:extensionElements />
     <bpmn:participant id="Participant_04049ih" name="публикация приложения" processRef="Process_0nuhigb">
@@ -10,7 +10,7 @@
   <bpmn:message id="Message_Rejected" name="Заявка отклонена" />
   <bpmn:message id="Message_Error" name="Ошибка" />
   <bpmn:message id="Message_TaskAssigned" name="Уведомление о назначенной задаче" />
-  <bpmn:process id="Process_0nuhigb" isExecutable="true">
+  <bpmn:process id="Process_0nuhigb" isExecutable="true" camunda:historyTimeToLive="180">
     <bpmn:laneSet id="LaneSet_1rkmpi4">
       <bpmn:lane id="Lane_0vc4rcf" name="Внешняя система">
         <bpmn:flowNodeRef>Activity_17nktqr</bpmn:flowNodeRef>
@@ -67,7 +67,6 @@
         <bpmn:flowNodeRef>Event_1rn8ekl</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-
     <bpmn:endEvent id="Event_1rn8ekl" name="Получение информации о неодобренной заявки">
       <bpmn:incoming>Flow_1wdxa18</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1nw6voc" messageRef="Message_Rejected" />
@@ -165,13 +164,19 @@
       <bpmn:outgoing>Flow_1fathe1</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_0vzbp0m" name="Нет" sourceRef="Gateway_0witg8a" targetRef="Activity_10bpczs">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1fathe1" name="Да" sourceRef="Gateway_0witg8a" targetRef="Activity_08r0fcj">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_12t7sbx" sourceRef="Activity_0j8g6hn" targetRef="Event_1v0bj4w" />
-    <bpmn:userTask id="Activity_0rvvzrl" name="Проверка модератора">
+    <bpmn:userTask id="Activity_0rvvzrl" name="Проверка модератора" camunda:assignee="moderator">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="approved" label="Одобрено?" type="boolean" defaultValue="true" />
+          <camunda:formField id="moderatorComment" label="Комментарий модератора" type="string" defaultValue="круто классно" />
+        </camunda:formData>
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_1frhhrk</bpmn:incoming>
       <bpmn:outgoing>Flow_05kc3r4</bpmn:outgoing>
     </bpmn:userTask>
@@ -209,12 +214,11 @@
       <bpmn:outgoing>Flow_1wzup9u</bpmn:outgoing>
       <bpmn:outgoing>Flow_1ibst4y</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-
-    <bpmn:sequenceFlow id="Flow_1wzup9u" name="Да" sourceRef="Gateway_1r8j49w" targetRef="Activity_17nktqr" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1wzup9u" name="Да" sourceRef="Gateway_1r8j49w" targetRef="Activity_17nktqr">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1ibst4y" name="Нет" sourceRef="Gateway_1r8j49w" targetRef="Event_01cd5s2" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1ibst4y" name="Нет" sourceRef="Gateway_1r8j49w" targetRef="Event_01cd5s2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:task id="Activity_08vaud4" name="Проверка прав доступа">
       <bpmn:incoming>Flow_07yzdcu</bpmn:incoming>
@@ -236,11 +240,11 @@
       <bpmn:outgoing>Flow_0y67gtk</bpmn:outgoing>
       <bpmn:outgoing>Flow_1sutpu5</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0y67gtk" name="Да" sourceRef="Gateway_1i445fq" targetRef="Activity_05rkogb" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0y67gtk" name="Да" sourceRef="Gateway_1i445fq" targetRef="Activity_05rkogb">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1sutpu5" name="Нет" sourceRef="Gateway_1i445fq" targetRef="Activity_00x8xc3" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1sutpu5" name="Нет" sourceRef="Gateway_1i445fq" targetRef="Activity_00x8xc3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_1wgaqgp" name="Приложение удовлетворяет всем требованиям?">
       <bpmn:incoming>Flow_1wrxcco</bpmn:incoming>
@@ -248,10 +252,10 @@
       <bpmn:outgoing>Flow_0wz68mk</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_066jpiz" name="Нет" sourceRef="Gateway_1wgaqgp" targetRef="Gateway_1i445fq">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0wz68mk" name="Да" sourceRef="Gateway_1wgaqgp" targetRef="Activity_0bb355a">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:task id="Activity_0t9916q" name="Проверка файлов приложении и его соответсии с политикам Google Play">
       <bpmn:incoming>Flow_0gtjtok</bpmn:incoming>
@@ -286,11 +290,11 @@
       <bpmn:outgoing>Flow_0mq9dkr</bpmn:outgoing>
       <bpmn:outgoing>Flow_1blekmd</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0mq9dkr" name="Нет" sourceRef="Gateway_15w3tq1" targetRef="Activity_0597csj" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0mq9dkr" name="Нет" sourceRef="Gateway_15w3tq1" targetRef="Activity_0597csj">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1blekmd" name="Да" sourceRef="Gateway_15w3tq1" targetRef="Activity_1qtcj7t" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1blekmd" name="Да" sourceRef="Gateway_15w3tq1" targetRef="Activity_1qtcj7t">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0lc86tc" sourceRef="Activity_1swui4b" targetRef="Activity_1vkzzsh" />
     <bpmn:task id="Activity_1vkzzsh" name="Обработка платежа">
@@ -318,11 +322,11 @@
       <bpmn:outgoing>Flow_087jjws</bpmn:outgoing>
       <bpmn:outgoing>Flow_0whkp0d</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_087jjws" name="Нет" sourceRef="Gateway_1tlrytp" targetRef="Activity_07dogqb" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_087jjws" name="Нет" sourceRef="Gateway_1tlrytp" targetRef="Activity_07dogqb">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0whkp0d" name="Да" sourceRef="Gateway_1tlrytp" targetRef="Activity_18imp65" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0whkp0d" name="Да" sourceRef="Gateway_1tlrytp" targetRef="Activity_18imp65">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:task id="Activity_1mjees6" name="Валидация приложения">
       <bpmn:incoming>Flow_1a0ogm9</bpmn:incoming>
@@ -341,11 +345,11 @@
       <bpmn:outgoing>Flow_0gtht7s</bpmn:outgoing>
       <bpmn:outgoing>Flow_1st0hc6</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0gtht7s" name="Нет" sourceRef="Gateway_0g1pdvx" targetRef="Activity_1i3jpdp" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0gtht7s" name="Нет" sourceRef="Gateway_0g1pdvx" targetRef="Activity_1i3jpdp">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1st0hc6" name="Да" sourceRef="Gateway_0g1pdvx" targetRef="Activity_1rkn378" >
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1st0hc6" name="Да" sourceRef="Gateway_0g1pdvx" targetRef="Activity_1rkn378">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:task id="Activity_1m18v6f" name="Проверка прав доступа разработчика">
       <bpmn:incoming>Flow_0zfx9ep</bpmn:incoming>
@@ -686,7 +690,7 @@
         <di:waypoint x="3970" y="1890" />
         <di:waypoint x="4120" y="1890" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3976" y="1860" width="20" height="14" />
+          <dc:Bounds x="3977" y="1860" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1fathe1_di" bpmnElement="Flow_1fathe1">
@@ -734,7 +738,7 @@
         <di:waypoint x="2910" y="1075" />
         <di:waypoint x="2910" y="1162" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2915" y="1116" width="20" height="14" />
+          <dc:Bounds x="2916" y="1116" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_11klgpg_di" bpmnElement="Flow_11klgpg">
@@ -757,7 +761,7 @@
         <di:waypoint x="3195" y="840" />
         <di:waypoint x="3560" y="840" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3368" y="822" width="20" height="14" />
+          <dc:Bounds x="3369" y="822" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_066jpiz_di" bpmnElement="Flow_066jpiz">
@@ -765,7 +769,7 @@
         <di:waypoint x="3060" y="840" />
         <di:waypoint x="3145" y="840" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3065" y="795" width="20" height="14" />
+          <dc:Bounds x="3066" y="795" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0wz68mk_di" bpmnElement="Flow_0wz68mk">
@@ -798,7 +802,7 @@
         <di:waypoint x="2300" y="840" />
         <di:waypoint x="2380" y="840" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2340" y="813" width="20" height="14" />
+          <dc:Bounds x="2341" y="813" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1blekmd_di" bpmnElement="Flow_1blekmd">
@@ -832,7 +836,7 @@
         <di:waypoint x="1560" y="840" />
         <di:waypoint x="1750" y="840" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1660" y="823" width="20" height="14" />
+          <dc:Bounds x="1661" y="823" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0whkp0d_di" bpmnElement="Flow_0whkp0d">
@@ -855,7 +859,7 @@
         <di:waypoint x="640" y="840" />
         <di:waypoint x="760" y="840" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="645" y="795" width="20" height="14" />
+          <dc:Bounds x="646" y="795" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1st0hc6_di" bpmnElement="Flow_1st0hc6">

@@ -8,7 +8,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("notifyModeratorDelegate")
 public class NotifyModeratorDelegate implements JavaDelegate {
 
     private final MailNotificationService mailNotificationService;

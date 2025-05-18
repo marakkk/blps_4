@@ -22,7 +22,6 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final AppRepository appRepository;
     private final UserRepository userRepository;
-    private final JmsTemplate jmsTemplate;
     private final Random random = new Random();
 
 

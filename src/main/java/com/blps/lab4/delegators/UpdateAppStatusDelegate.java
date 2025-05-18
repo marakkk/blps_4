@@ -14,7 +14,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("updateAppStatusDelegate")
 public class UpdateAppStatusDelegate implements JavaDelegate {
     private final AppRepository appRepository;
     private final ConnectionFactory jiraConnectionFactory;

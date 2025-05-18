@@ -6,6 +6,7 @@ import com.blps.lab4.entities.googleplay.App;
 import com.blps.lab4.errors.ErrorResponse;
 import com.blps.lab4.services.AppService;
 import com.blps.lab4.services.DeveloperService;
+import com.blps.lab4.starters.AppSubmissionProcessStarter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +22,25 @@ class DeveloperController {
 
     private final DeveloperService developerService;
     private final AppService appService;
+    private final AppSubmissionProcessStarter processStarter;
 
-    @PreAuthorize("hasRole('DEVELOPER') and hasAuthority('APP_SUBMIT')")
     @PostMapping("/{developerId}/apps/{appId}/submit")
     public ResponseEntity<Object> submitApp(
-            @PathVariable Long developerId,
-            @PathVariable Long appId,
-            @RequestParam boolean wantsToMonetize,
-            @RequestParam boolean wantsToCharge) {
+            @PathVariable("developerId") Long developerId,
+            @PathVariable("appId") Long appId,
+            @RequestParam(name = "wantsToMonetize") boolean wantsToMonetize,
+            @RequestParam(name = "wantsToCharge") boolean wantsToCharge) {
 
         try {
             App submittedApp = developerService.submitApp(developerId, appId, wantsToMonetize, wantsToCharge);
+
+            processStarter.startSubmissionProcess(
+                    submittedApp.getId(),
+                    developerId,
+                    wantsToMonetize,
+                    wantsToCharge
+            );
+
             return ResponseEntity.ok(submittedApp);
         } catch (IllegalStateException e) {
             ErrorResponse errorResponse = new ErrorResponse("Error", e.getMessage());

@@ -7,7 +7,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("payoutDelegate")
 public class PayoutDelegate implements JavaDelegate {
 
     private final PayoutService payoutService;

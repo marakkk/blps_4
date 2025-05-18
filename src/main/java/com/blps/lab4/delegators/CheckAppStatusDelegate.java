@@ -9,7 +9,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("checkAppStatusDelegate")
 public class CheckAppStatusDelegate implements JavaDelegate {
 
     private final AppRepository appRepository;

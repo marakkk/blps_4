@@ -34,8 +34,6 @@ public class DeveloperService {
     private final PaymentRepository paymentRepository;
     private final GooglePlayService googlePlayService;
     private final UserTransactionManager userTransaction;
-    private final RuntimeService runtimeService;
-
 
     private boolean isValidVersion(double version) {
         return version > 0;
@@ -110,22 +108,14 @@ public class DeveloperService {
             MonetizationType monetizationType = determineMonetizationType(wantsToMonetize, wantsToCharge);
             app.setMonetizationType(monetizationType);
 
-            Payment payment = createPaymentForAppSubmission(developerId, appId, monetizationType);
-            if (!processPayment(payment)) throw new IllegalStateException("Payment failed");
+            //Payment payment = createPaymentForAppSubmission(developerId, appId, monetizationType);
+            //if (!processPayment(payment)) throw new IllegalStateException("Payment failed");
 
             app.setStatus(AppStatus.PENDING);
             app.setDeveloper(developer);
             appRepository.save(app);
 
-            notifyDeveloperPaymentSuccess(developer, payment);
-
-            Map<String, Object> variables = Map.of(
-                    "developerId", developerId,
-                    "appId", appId,
-                    "monetizationType", monetizationType.name()
-            );
-            runtimeService.startProcessInstanceByKey("submitAppProcess", variables);
-
+            //notifyDeveloperPaymentSuccess(developer, payment);
 
             userTransaction.commit();
             return app;
@@ -156,14 +146,6 @@ public class DeveloperService {
             if ("App approved automatically.".equals(reviewResult.get("message"))) {
                 googlePlayService.publishApp(app);
 
-                Map<String, Object> variables = Map.of(
-                        "developerId", developerId,
-                        "appId", appId,
-                        "approvedByModerator", true,
-                        "moderatorComment", "Auto-approved"
-                );
-                runtimeService.startProcessInstanceByKey("publishAppProcess", variables);
-
                 userTransaction.commit();
                 return Map.of("message", "Published automatically");
             }
@@ -176,14 +158,6 @@ public class DeveloperService {
                 }
 
                 googlePlayService.publishApp(app);
-
-                Map<String, Object> variables = Map.of(
-                        "developerId", developerId,
-                        "appId", appId,
-                        "approvedByModerator", approvedByModerator,
-                        "moderatorComment", moderatorComment
-                );
-                runtimeService.startProcessInstanceByKey("publishAppProcess", variables);
 
                 userTransaction.commit();
                 return Map.of("message", "Published after review");
@@ -228,5 +202,3 @@ public class DeveloperService {
                 .build();
     }
 }
-
-
