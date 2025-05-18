@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0lsr8tq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0lsr8tq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
   <bpmn:collaboration id="Collaboration_1vwk3m0">
     <bpmn:extensionElements />
     <bpmn:participant id="Participant_04049ih" name="публикация приложения" processRef="Process_0nuhigb">
       <bpmn:participantMultiplicity />
     </bpmn:participant>
   </bpmn:collaboration>
+  <bpmn:message id="Message_Approved" name="Заявка одобрена" />
+  <bpmn:message id="Message_Rejected" name="Заявка отклонена" />
+  <bpmn:message id="Message_Error" name="Ошибка" />
+  <bpmn:message id="Message_TaskAssigned" name="Уведомление о назначенной задаче" />
   <bpmn:process id="Process_0nuhigb" isExecutable="true" camunda:historyTimeToLive="180">
     <bpmn:laneSet id="LaneSet_1rkmpi4">
       <bpmn:lane id="Lane_0vc4rcf" name="Внешняя система">
@@ -65,12 +69,12 @@
     </bpmn:laneSet>
     <bpmn:endEvent id="Event_1rn8ekl" name="Получение информации о неодобренной заявки">
       <bpmn:incoming>Flow_1wdxa18</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1nw6voc" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1nw6voc" messageRef="Message_Rejected" />
     </bpmn:endEvent>
     <bpmn:intermediateCatchEvent id="Event_1czeb00" name="Получение информации о одобреной заявки">
       <bpmn:incoming>Flow_03f7u4p</bpmn:incoming>
       <bpmn:outgoing>Flow_0a55bzh</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0ex531y" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0ex531y" messageRef="Message_Approved" />
     </bpmn:intermediateCatchEvent>
     <bpmn:task id="Activity_1sgnsan" name="Проинформировать разработчика">
       <bpmn:incoming>Flow_0s20oez</bpmn:incoming>
@@ -78,7 +82,7 @@
     </bpmn:task>
     <bpmn:endEvent id="Event_0c87klr" name="Получение информации об ошибке">
       <bpmn:incoming>Flow_17umtia</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0bzly4a" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0bzly4a" messageRef="Message_Error" />
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_17umtia" sourceRef="Activity_1sgnsan" targetRef="Event_0c87klr" />
     <bpmn:task id="Activity_1i3jpdp" name="Откланяется запрос">
@@ -132,16 +136,16 @@
       <bpmn:outgoing>Flow_0eoj2w1</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_0eoj2w1" sourceRef="Activity_1w8pesv" targetRef="Activity_0j8g6hn" />
-    <bpmn:intermediateCatchEvent id="Event_031o5ka" name="Статус заявки исзменяется на &#34;Rejected&#34;">
+    <bpmn:intermediateCatchEvent id="Event_031o5ka" name="Статус заявки изменяется на &#34;Rejected&#34;">
       <bpmn:incoming>Flow_0vn4qgi</bpmn:incoming>
       <bpmn:outgoing>Flow_0gannx2</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1olgr5p" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1olgr5p" messageRef="Message_Rejected" />
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_0gannx2" sourceRef="Event_031o5ka" targetRef="Activity_00x8xc3" />
-    <bpmn:intermediateCatchEvent id="Event_0qy9fl4" name="Статус заявки исзменяется на &#34;Approved&#34;">
+    <bpmn:intermediateCatchEvent id="Event_0qy9fl4" name="Статус заявки изменяется на &#34;Approved&#34;">
       <bpmn:incoming>Flow_172fwl9</bpmn:incoming>
       <bpmn:outgoing>Flow_19hpeab</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0hld30z" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0hld30z" messageRef="Message_Approved" />
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_19hpeab" sourceRef="Event_0qy9fl4" targetRef="Activity_0bb355a" />
     <bpmn:task id="Activity_10bpczs" name="Отклоняет заявку">
@@ -192,7 +196,7 @@
     <bpmn:intermediateCatchEvent id="Event_1v0bj4w" name="Получает уведомление о назначенной задаче">
       <bpmn:incoming>Flow_12t7sbx</bpmn:incoming>
       <bpmn:outgoing>Flow_1frhhrk</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0j4e0xv" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0j4e0xv" messageRef="Message_TaskAssigned" />
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_1frhhrk" sourceRef="Event_1v0bj4w" targetRef="Activity_0rvvzrl" />
     <bpmn:task id="Activity_17nktqr" name="Создание задачи">
