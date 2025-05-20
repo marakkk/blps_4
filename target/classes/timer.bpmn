@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0alybxk" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0alybxk" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
   <bpmn:collaboration id="Collaboration_08oaa2l">
     <bpmn:participant id="Participant_1da0ymb" name="выплата разработчикам" processRef="Process_11ph6uk" />
   </bpmn:collaboration>
@@ -13,7 +13,7 @@
     </bpmn:laneSet>
     <bpmn:sequenceFlow id="Flow_0kt5swu" sourceRef="Event_0wej64f" targetRef="Activity_1dl0d6m" />
     <bpmn:sequenceFlow id="Flow_1fsvy35" sourceRef="Activity_1dl0d6m" targetRef="Event_18q04rc" />
-    <bpmn:serviceTask id="Activity_1dl0d6m" name="Выплата разработчикам">
+    <bpmn:serviceTask id="Activity_1dl0d6m" name="Выплата разработчикам" camunda:delegateExpression="">
       <bpmn:incoming>Flow_0kt5swu</bpmn:incoming>
       <bpmn:outgoing>Flow_1fsvy35</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -21,8 +21,13 @@
       <bpmn:incoming>Flow_1fsvy35</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:startEvent id="Event_0wej64f">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle />
+      </bpmn:extensionElements>
       <bpmn:outgoing>Flow_0kt5swu</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_03b43jq" />
+      <bpmn:timerEventDefinition id="TimerEventDefinition_03b43jq">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/PT5M</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
     </bpmn:startEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
