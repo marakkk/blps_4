@@ -1,5 +1,6 @@
 package com.blps.lab4.delegators;
 
+import com.blps.lab4.enums.AppStatus;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,10 @@ public class AppValidationDelegate implements JavaDelegate {
             throw new IllegalStateException("App permissions are not correct");
         }
 
+        app.setStatus(AppStatus.VALIDATED);
+        appRepository.save(app);
+
         execution.setVariable("isAppValid", true);
     }
+
 }

@@ -10,7 +10,7 @@ import com.blps.lab4.repo.googleplay.AppRepository;
 import com.blps.lab4.enums.AppStatus;
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Component("developerPublishAccessCheckDelegate")
 @RequiredArgsConstructor
 public class DeveloperPublishAccessCheckDelegate implements JavaDelegate {
 

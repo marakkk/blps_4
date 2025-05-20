@@ -1,6 +1,7 @@
 package com.blps.lab4.delegators;
 
 import com.blps.lab4.entities.googleplay.App;
+import com.blps.lab4.enums.AppStatus;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
@@ -22,21 +23,12 @@ public class ManualReviewCreationDelegate implements JavaDelegate {
         App app = appRepository.findById(appId)
                 .orElseThrow(() -> new IllegalStateException("App not found"));
 
-        Map<String, String> result = googlePlayService.manualReviewApp(
-                app,
-                false,
-                "Pending manual review"
-        );
-
-        if (result.containsKey("reason")) {
-            throw new IllegalStateException("Failed to create manual review task: " + result.get("reason"));
+        if (app.getStatus() != AppStatus.UNDER_REVIEW) {
+            throw new IllegalStateException("App must be in UNDER_REVIEW status for manual review.");
         }
 
         execution.setVariable("manualReviewRequested", true);
         execution.setVariable("reviewStatus", "PENDING");
 
-        if (result.containsKey("issueId")) {
-            execution.setVariable("jiraIssueId", result.get("issueId"));
-        }
     }
 }

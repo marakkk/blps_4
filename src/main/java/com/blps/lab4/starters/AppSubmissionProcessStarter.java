@@ -20,6 +20,6 @@ public class AppSubmissionProcessStarter {
                 "wantsToCharge", wantsToCharge
         );
 
-        runtimeService.startProcessInstanceByKey("Process_0nuhigb", variables);
+        runtimeService.startProcessInstanceByKey("Process_0r381y3", variables);
     }
 }

@@ -1,7 +1,10 @@
 package com.blps.lab4.delegators;
 
+import com.blps.lab4.services.DeveloperService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.blps.lab4.repo.payments.PaymentRepository;
 import com.blps.lab4.entities.payments.Payment;
@@ -13,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentProcessingDelegate implements JavaDelegate {
 
+    private static final Logger logger = LoggerFactory.getLogger(PaymentProcessingDelegate.class);
     private final PaymentRepository paymentRepository;
     private static final double PUBLISHING_FEE = 25.0;
 
@@ -38,6 +42,8 @@ public class PaymentProcessingDelegate implements JavaDelegate {
         }
 
         paymentRepository.save(payment);
+        logger.info("Developer {} has successfully paid the fee: {}", developerId, payment.getAmount());
+
         execution.setVariable("paymentStatus", payment.getStatus().name());
     }
 }

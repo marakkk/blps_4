@@ -7,6 +7,8 @@ import com.blps.lab4.resourceAdapter.*;
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.ConnectionFactory;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ public class GooglePlayService {
 
     private final AppRepository appRepository;
     private final Random random = new Random();
+    private static final Logger logger = LoggerFactory.getLogger(GooglePlayService.class);
 
     public Map<String, String> autoReviewApp(App app) {
 
@@ -54,32 +57,16 @@ public class GooglePlayService {
             app.setStatus(AppStatus.UNDER_REVIEW);
 
             response.put("message", "App requires manual review.");
+            logger.info("App requires manual review.");
         } else {
             app.setStatus(AppStatus.APPROVED);
             response.put("message", "App approved automatically.");
+            logger.info("App approved automatically.");
         }
 
         appRepository.save(app);
         return response;
 
-    }
-
-    public Map<String, String> manualReviewApp(App app, boolean approved, String moderatorComment) {
-        if (app.getStatus() != AppStatus.UNDER_REVIEW) {
-            throw new IllegalStateException("App must be in UNDER_REVIEW status for manual review.");
-        }
-
-        Map<String, String> responses = new HashMap<>();
-        if (approved) {
-            app.setStatus(AppStatus.APPROVED);
-            responses.put("message", "App approved by moderator.");
-        } else {
-            app.setStatus(AppStatus.REJECTED);
-            responses.put("reason", moderatorComment);
-        }
-
-        appRepository.save(app);
-        return responses;
     }
 
     public void publishApp(App app) {

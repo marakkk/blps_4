@@ -30,8 +30,9 @@ public class AppRequirementsCheckDelegate implements JavaDelegate {
             throw new IllegalStateException("App doesn't meet minimum publication requirements");
         }
 
+        app.setStatus(AppStatus.PENDING);
+        appRepository.save(app);
+
         execution.setVariable("meetsPublicationRequirements", meetsRequirements);
     }
-
-    //PENDING STATUS
 }

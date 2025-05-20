@@ -32,16 +32,15 @@ class DeveloperController {
             @RequestParam(name = "wantsToCharge") boolean wantsToCharge) {
 
         try {
-            App submittedApp = developerService.submitApp(developerId, appId, wantsToMonetize, wantsToCharge);
 
             processStarter.startSubmissionProcess(
-                    submittedApp.getId(),
+                    appId,
                     developerId,
                     wantsToMonetize,
                     wantsToCharge
             );
 
-            return ResponseEntity.ok(submittedApp);
+            return ResponseEntity.ok(Map.of("message", "Submission process started"));
         } catch (IllegalStateException e) {
             ErrorResponse errorResponse = new ErrorResponse("Error", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

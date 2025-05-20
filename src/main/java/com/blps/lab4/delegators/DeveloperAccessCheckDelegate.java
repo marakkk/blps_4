@@ -21,9 +21,7 @@ public class DeveloperAccessCheckDelegate implements JavaDelegate {
         Developer developer = developerRepository.findById(developerId)
                 .orElseThrow(() -> new IllegalStateException("Developer not found"));
 
-        if (developer.getAccStatus() == DevAccount.UNPAID) {
-            throw new IllegalStateException("Developer account is unpaid");
-        }
+        if (developer.getAccStatus() == DevAccount.UNPAID) register(developerId);
 
         if (!developer.isPaymentProfile()) {
             throw new IllegalStateException("Payment profile not set up");
@@ -31,4 +29,12 @@ public class DeveloperAccessCheckDelegate implements JavaDelegate {
 
         execution.setVariable("hasSubmissionAccess", true);
     }
+
+    public void register(Long developerId) {
+        Developer dev = developerRepository.findById(developerId).orElseThrow();
+        dev.setAccStatus(DevAccount.PAID);
+        dev.setPaymentProfile(true);
+        developerRepository.save(dev);
+    }
+
 }

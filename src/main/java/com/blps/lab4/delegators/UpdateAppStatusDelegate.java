@@ -23,7 +23,9 @@ public class UpdateAppStatusDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         Boolean approved = (Boolean) execution.getVariable("approved");
         String moderatorComment = (String) execution.getVariable("moderatorComment");
-        App app = (App) execution.getVariable("app");
+        Long appId = (Long) execution.getVariable("appId");
+        App app = appRepository.findById(appId).orElseThrow();
+
         String jiraIssueId = (String) execution.getVariable("jiraIssueId");
 
         try (JiraConnection jiraConnection = (JiraConnection) jiraConnectionFactory.getConnection()) {
@@ -32,6 +34,7 @@ public class UpdateAppStatusDelegate implements JavaDelegate {
             if (approved) {
                 app.setStatus(AppStatus.APPROVED);
                 interaction.execute(new JiraStatusUpdateRecord(jiraIssueId, "Done", "updateStatus"));
+                execution.setVariable("approvedByModerator", true);
                 execution.setVariable("message", "App approved by moderator.");
             } else {
                 app.setStatus(AppStatus.REJECTED);
