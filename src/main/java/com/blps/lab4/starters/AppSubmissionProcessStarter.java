@@ -22,4 +22,11 @@ public class AppSubmissionProcessStarter {
 
         runtimeService.startProcessInstanceByKey("Process_0nuhigb", variables);
     }
+
+
+
+
+
+
+    //starter modentiyacija
 }
