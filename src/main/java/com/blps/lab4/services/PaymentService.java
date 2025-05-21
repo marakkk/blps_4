@@ -25,6 +25,7 @@ public class PaymentService {
     private final Random random = new Random();
 
 
+
     public Payment payForApp(Long userId, Long appId) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -85,26 +86,13 @@ public class PaymentService {
         userRepository.save(user);
 
         app.setRevenue(app.getRevenue() + amount);
+        app.getDeveloper().setEarnings(app.getDeveloper().getEarnings() + amount);
         appRepository.save(app);
 
         payment.setStatus(PaymentStatus.SUCCESS);
         return paymentRepository.save(payment);
     }
 
-    public String initiatePaidAppPurchase(Long userId, Long appId) {
-        App app = appRepository.findById(appId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "App not found"));
-
-        if (!app.isNotFree()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This app is free");
-        }
-
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-
-        return "Payment process started for app: " + app.getName();
-    }
 
 
 }

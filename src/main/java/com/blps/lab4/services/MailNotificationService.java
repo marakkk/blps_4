@@ -29,6 +29,10 @@ public class MailNotificationService {
         sendEmail(moderatorEmail, subject, body);
     }
 
+    public void notifyUser(String userEmail, String subject, String text) {
+        sendEmail(userEmail, subject, text);
+    }
+
     private void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -36,5 +40,4 @@ public class MailNotificationService {
         message.setText(text);
         mailSender.send(message);
     }
-
 }
